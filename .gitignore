@@ -1,6 +1,6 @@
 node_modules/
-ui/
-dist/
+/ui/
+/dist/
 .dbx-dev/
 *.dbxp
 *.artifact.json
