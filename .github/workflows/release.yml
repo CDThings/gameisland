@@ -1,27 +1,24 @@
-name: plugin-release
+# 官方 CLI 模板同款：Release 发布时由 t8y2/dbx 复用 workflow 构建未签名候选包。
+# package-command 需自行带前端构建（ui/ 产物不入 git）：
+#   npm --prefix app install && npm --prefix app run build && dbx-plugin package .
+name: Release DBX plugin
 
 on:
-  push:
-    tags: ["v*"]
+  release:
+    types: [published]
 
 permissions:
   contents: write
 
 jobs:
-  build:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 22
-      - run: npm --prefix app install
-      - run: npm run build
-      - run: npm run test
-      - run: npm install -g @dbx-app/plugin-cli
-      - run: dbx-plugin package .
-      - uses: softprops/action-gh-release@v2
-        with:
-          files: |
-            dist/*.dbxp
-            dist/*.artifact.json
+  release:
+    uses: t8y2/dbx/.github/workflows/plugin-release-reusable.yml@plugin-cli-v0.1.10
+    with:
+      release-tag: ${{ github.event.release.tag_name }}
+      package-command: npm --prefix app install && npm --prefix app run build && dbx-plugin package .
+      package-path: dist/*.dbxp
+      metadata-path: dist/*.artifact.json
+      plugin-cli-version: 0.1.10
+      go-version: ""
+      rust-toolchain: ""
+      build-matrix: '{"include":[{"runner":"ubuntu-24.04","target":"universal"}]}'
