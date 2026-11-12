@@ -1,0 +1,20 @@
+{
+  "name": "game-island",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "description": "游戏岛 DBX 插件前端工程（10 款纯离线小游戏）",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "build:watch": "vite build --watch"
+  },
+  "dependencies": {
+    "vue": "^3.4.27",
+    "vue-router": "^4.3.2"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-vue": "^5.0.5",
+    "vite": "^5.2.11"
+  }
+}

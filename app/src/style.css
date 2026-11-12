@@ -1,0 +1,176 @@
+/* 游戏岛 · 像素 2D 全屏风（v1.2 ADR-11）：明亮童趣，16 色，硬描边，禁玻璃拟态 */
+
+/* ===== 暖纸日常 token 桥（v2 · 2026-10-28）：与宿主 apps/app 的 --hn-* 同值，手动同步自 apps/app/src/styles/tokens.scss =====
+   仅影响使用 var(--hn-*) 的页面（当前：游戏岛 Island.vue）；像素风页面继续走 --p* 不受影响 */
+:root {
+  --hn-bg: #F0E8DC; --hn-paper: #FFFCF7; --hn-sand: #E9E0D3;
+  --hn-ink: #2F2C27; --hn-muted: #777168; --hn-faint: #A69D91;
+  --hn-line: #E7DCCB; --hn-line-soft: #EEE6DA;
+  --hn-green: #3E9B6E; --hn-green-soft: #E5F1E8; --hn-green-deep: #397D59;
+  --hn-blue: #4A90C4; --hn-blue-soft: #E4EEF6; --hn-blue-deep: #3E79A5;
+  --hn-orange: #E8A24B; --hn-orange-soft: #F9EBD8; --hn-orange-deep: #A96D1E;
+  --hn-coral: #E0784A; --hn-coral-soft: #F8E7DF; --hn-coral-deep: #B65F3B;
+  --hn-on-reward: #342A1D;
+  --hn-shadow-card: 0 8px 22px rgba(86, 66, 43, 0.045);
+  --hn-shadow-hero: 0 10px 26px rgba(86, 66, 43, 0.06);
+}
+:root {
+  --p0: #FFF6E5; --p1: #8FD8F8; --p1b: #DFF6FF; --p2: #7ED957; --p2b: #57B93C;
+  --p3: #FF6B6B; --p4: #FFD43B; --p5: #6FE3C1; --p6: #B58BFF; --p7: #FFB3C6;
+  --ink: #2B2B2B; --white: #FFF; --wood: #C98850; --wood-d: #8F5B33;
+}
+
+* { box-sizing: border-box; }
+html, body {
+  margin: 0; height: 100%;
+  background: var(--p1);
+  color: var(--ink);
+  font-family: 'Yuanti SC', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+  -webkit-font-smoothing: none;
+  image-rendering: pixelated;
+  touch-action: manipulation;
+  overscroll-behavior: none;
+}
+#app { height: 100%; }
+canvas { image-rendering: pixelated; }
+
+/* 全屏场景容器 */
+.scene {
+  position: fixed; inset: 0; overflow: hidden;
+  display: flex; flex-direction: column;
+}
+.scene > .bg-canvas { position: absolute; inset: 0; width: 100%; height: 100%; z-index: 0; }
+.scene > .fg { position: relative; z-index: 2; flex: 1; overflow-y: auto; padding-bottom: 96px; }
+
+/* 像素按钮（方块 + 墨描边 + 硬阴影；按下=阴影消失） */
+.pbtn {
+  display: inline-block; cursor: pointer; user-select: none;
+  background: var(--p0); color: var(--ink);
+  border: 3px solid var(--ink); border-radius: 0;
+  box-shadow: 0 5px 0 var(--ink);
+  padding: 10px 18px; font-size: 15px; font-weight: 900;
+  transition: transform .05s steps(2), box-shadow .05s steps(2);
+}
+.pbtn:active, .pbtn.pressed { transform: translateY(5px); box-shadow: 0 0 0 var(--ink); }
+.pbtn-primary { background: var(--p5); }
+.pbtn-gold { background: var(--p4); }
+.pbtn-coral { background: var(--p3); color: #fff; }
+.pbtn-wood { background: var(--wood); }
+.pbtn.small { padding: 6px 12px; font-size: 13px; border-width: 2px; box-shadow: 0 4px 0 var(--ink); }
+.pbtn.small:active { transform: translateY(4px); box-shadow: 0 0 0 var(--ink); }
+.pbtn:disabled { background: var(--C, #E8E4DA); color: #999; box-shadow: none; }
+
+/* 像素面板 */
+.pcard {
+  background: var(--p0); border: 3px solid var(--ink);
+  box-shadow: 0 5px 0 rgba(43, 43, 43, .9);
+  margin: 10px; padding: 12px;
+}
+.pwood { background: var(--wood); color: var(--p0); }
+.pwood .dim { color: #f5e3c8; }
+
+/* 像素字（标题） */
+.pxl-title {
+  font-size: 22px; font-weight: 900; letter-spacing: 2px;
+  text-shadow: 2px 2px 0 var(--ink);
+}
+.pxl-title span { color: var(--p4); }
+
+.dim { color: #8a8478; font-size: 13px; }
+.p0 { color: inherit; }
+.num { font-variant-numeric: tabular-nums; }
+
+/* 像素 Toast（v1.2 去 Vant） */
+.p-toast {
+  position: fixed; top: 18%; left: 50%; transform: translateX(-50%);
+  z-index: 90; background: var(--p0); color: var(--ink);
+  border: 3px solid var(--ink); box-shadow: 0 5px 0 var(--ink);
+  padding: 10px 16px; font-weight: 900; font-size: 14px;
+  animation: ptoast .15s steps(2);
+  max-width: 80vw; text-align: center;
+}
+.p-toast.err { background: var(--p3); color: #fff; }
+@keyframes ptoast { from { transform: translate(-50%, -8px); } to { transform: translate(-50%, 0); } }
+
+/* 像素 Dock（底部 4 格场景传送门） */
+.pdock {
+  position: fixed; bottom: 0; left: 50%; transform: translateX(-50%);
+  width: 100%; max-width: 520px; z-index: 50;
+  display: grid; grid-template-columns: repeat(4, 1fr);
+  background: var(--p0); border-top: 3px solid var(--ink);
+  padding: 6px 4px calc(6px + env(safe-area-inset-bottom));
+}
+.pdock-item {
+  display: flex; flex-direction: column; align-items: center; gap: 2px;
+  padding: 6px 0; cursor: pointer; border: 2px solid transparent;
+}
+.pdock-item .ic { width: 26px; height: 26px; image-rendering: pixelated; }
+.pdock-item .lb { font-size: 11px; font-weight: 900; }
+.pdock-item.on { background: var(--p4); border-color: var(--ink); box-shadow: inset 0 -4px 0 var(--ink); }
+
+/* 像素模态 */
+.pmask {
+  position: fixed; inset: 0; z-index: 80;
+  background: rgba(43, 43, 43, .55);
+  display: flex; align-items: center; justify-content: center;
+}
+.pmodal {
+  width: 320px; background: var(--p0); border: 3px solid var(--ink);
+  box-shadow: 0 8px 0 var(--ink); padding: 18px 16px; text-align: center;
+}
+.pmodal h3 { margin: 4px 0 8px; font-size: 18px; font-weight: 900; }
+.pmodal .row { display: flex; gap: 8px; justify-content: center; margin-top: 14px; flex-wrap: wrap; }
+
+/* 输入框（像素纸片） */
+.pinput {
+  width: 100%; background: #E8E4DA; border: 3px solid var(--ink);
+  padding: 10px; font-size: 15px; font-weight: 700; color: var(--ink);
+  outline: none;
+}
+.pinput:focus { background: #fff; }
+
+/* 星级评价 */
+.stars { display: flex; gap: 6px; justify-content: center; margin: 8px 0; }
+.stars i { width: 22px; height: 22px; image-rendering: pixelated; animation: starpop .2s steps(2) backwards; }
+.stars i:nth-child(2) { animation-delay: .1s; }
+.stars i:nth-child(3) { animation-delay: .2s; }
+@keyframes starpop { from { transform: scale(0); } to { transform: scale(1); } }
+
+/* 金币抛掷 */
+.coinfly { position: absolute; width: 14px; height: 14px; image-rendering: pixelated; z-index: 60; }
+
+/* 即时反馈动画（v1.15）：全部纯 CSS（steps 像素感），不阻塞 setTimeout 驱动的 AI 逻辑时序 */
+@keyframes cardInK { from { opacity: 0; transform: translateY(-12px) scale(.85); } to { opacity: 1; transform: none; } }
+@keyframes cardFlipK { 0% { transform: scaleX(1); } 45% { transform: scaleX(0); } 55% { transform: scaleX(0); } 100% { transform: scaleX(1); } }
+@keyframes popInK { 0% { transform: scale(.5); opacity: .4; } 60% { transform: scale(1.12); } 100% { transform: scale(1); opacity: 1; } }
+@keyframes boomShakeK { 0%, 100% { transform: translate(0, 0); } 25% { transform: translate(-3px, 1px); } 50% { transform: translate(3px, -1px); } 75% { transform: translate(-2px, -1px); } }
+.fx-cardin { animation: cardInK .18s steps(2) both; }
+.fx-flip { animation: cardFlipK .24s steps(3) both; }
+.fx-pop { animation: popInK .3s steps(3) both; }
+.fx-boom { animation: boomShakeK .3s steps(2); }
+
+/* 牌桌桌面词条 chip（v1.15 Balatro 化）：暗桌面上的金色小牌 */
+.chip-tag {
+  display: inline-flex; align-items: center; gap: 4px;
+  font-size: 11px; font-weight: 800; color: #f2b21b;
+  background: rgba(242, 178, 27, .14); border: 1.5px solid rgba(242, 178, 27, .55);
+  border-radius: 6px; padding: 2px 8px; line-height: 1.3;
+}
+.chip-tag b { color: #ffe9a8; }
+
+/* 麻将弃牌河新牌飞入 + 结算弹跳（v1.15） */
+.mj .mj-d.last { animation: cardInK .18s steps(2) both; }
+.mj .mj-seat.act .mj-name { animation: popInK .22s steps(2) both; }
+.mj .mj-final .big { animation: popInK .3s steps(3) both; }
+
+/* v1.97 触感打磨：点按不闪灰色高亮块、长按不弹系统选择/放大镜（孩子设备上高频烦恼） */
+body { -webkit-tap-highlight-color: transparent; }
+.gmk, .kid, .island, .gtable, .nn, .hd, .mj, .scene {
+  -webkit-user-select: none; user-select: none;
+  -webkit-touch-callout: none;
+}
+
+/* v1.54 自动横屏：极矮横屏（<380 高）整桌 zoom 适配——OrientationGate 设 --gate-zoom 变量并挂 .gate-zoom
+   v1.97：从只适配 .gtable（掼蛋）扩到全部四张牌桌根（掼蛋 .gtable / 牛牛 .nn / 德州 .hd / 麻将 .mj），
+   否则极矮横屏只有掼蛋能缩进屏内、其余三桌溢出、底部按钮不可达 */
+html.gate-zoom .gtable, html.gate-zoom .nn, html.gate-zoom .hd, html.gate-zoom .mj { zoom: var(--gate-zoom, 1); }

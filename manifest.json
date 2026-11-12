@@ -1,0 +1,30 @@
+{
+  "$schema": "https://raw.githubusercontent.com/t8y2/dbx/main/plugins/manifest.schema.json",
+  "manifest_version": 1,
+  "id": "cando.gameisland",
+  "name": "游戏岛 Game Island",
+  "publisher": "cando",
+  "version": "0.1.0",
+  "description": "十款纯离线小游戏：掼蛋 / 牛牛 / 德州扑克 / 麻将四张牌桌（人机同屏），打地鼠 / 小猫钓鱼 / 扫雷 / 跳棋 / 飞行棋 / 五子棋六款亲子游戏。无网络权限，存档保存在本机。",
+  "icon": "assets/plugin.svg",
+  "permissions": ["host.storage"],
+  "engines": {
+    "dbx": ">=0.5.68",
+    "host_api": "1"
+  },
+  "entrypoints": {
+    "ui": {
+      "root": "ui",
+      "entry": "ui/index.html"
+    }
+  },
+  "contributions": [
+    {
+      "type": "workbench",
+      "id": "cando.gameisland.workbench",
+      "label": "游戏岛",
+      "description": "十款纯离线小游戏的启动岛：四张牌桌 + 六款亲子游戏。",
+      "icon": "assets/plugin.svg"
+    }
+  ]
+}

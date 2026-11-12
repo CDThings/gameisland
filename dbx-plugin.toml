@@ -1,0 +1,12 @@
+# DBX 插件开发与打包配置（纯前端插件，无原生 Sidecar）
+# 打包只收 assets/ 与 ui/；ui/ 由 app 的 vite build 产出（outDir ../ui）
+#
+# 注意：这里刻意不配 [dev] ui_build/ui_watch —— 上游 CLI（0.1.10）在 Windows 把
+# 项目路径规范成 \\?\E:\... 传给子进程作 cwd，cmd.exe（npm 垫片）与 node 的模块
+# 解析都不认，构建必然失败。开发流程改为：先 `npm run build`，再 `dbx-plugin dev`
+# 静态服务已有 ui/（文件变化自动重载）。上游修复后可恢复 [dev] 配置。
+
+schema_version = 1
+
+[package]
+include = ["assets", "ui"]

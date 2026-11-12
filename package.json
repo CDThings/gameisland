@@ -1,0 +1,13 @@
+{
+  "name": "cando-gameisland",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "description": "游戏岛 Game Island —— DBX 插件（10 款纯离线小游戏）",
+  "scripts": {
+    "test": "node --test \"shared/test/*.test.js\"",
+    "build": "npm --prefix app run build",
+    "dev:plugin": "dbx-plugin dev --port 5190",
+    "package": "dbx-plugin package ."
+  }
+}
