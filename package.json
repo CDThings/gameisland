@@ -1,7 +1,7 @@
 {
   "name": "cando-gameisland",
   "private": true,
-  "version": "0.1.0",
+  "version": "0.1.1",
   "type": "module",
   "description": "游戏岛 Game Island —— DBX 插件（10 款纯离线小游戏）",
   "scripts": {

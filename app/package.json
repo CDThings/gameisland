@@ -1,7 +1,7 @@
 {
   "name": "game-island",
   "private": true,
-  "version": "0.1.0",
+  "version": "0.1.1",
   "type": "module",
   "description": "游戏岛 DBX 插件前端工程（10 款纯离线小游戏）",
   "scripts": {

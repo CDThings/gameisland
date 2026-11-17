@@ -14,8 +14,7 @@
       <div class="i-sub">牌桌 · 亲子小游戏 · 纯离线可玩</div>
     </div>
 
-    <!-- 身份状态胶囊（仅当 URL 携带身份/访客参数时出现；插件场景默认无参不显示） -->
-    <div v-if="authState" :class="['i-auth', 'i-auth--' + authTone]">{{ authState }}</div>
+    <!-- 身份/票据验证（0.1.1 起移除，插件纯离线：DBX 沙箱 CSP 禁网络，该路径无法也不被允许触发） -->
 
     <!-- 牌桌卡 2×2（纸白卡 + 色调 icon tile） -->
     <div class="i-grid">
@@ -52,7 +51,6 @@
 
 <script>
 // 游戏岛首页（插件线）：四牌桌=纯本地状态机（零 API、零网络权限），亲子六款同模式。
-// 身份胶囊保留 hash 参数兼容（guest/ticket/uid）；插件场景默认无参 → 无胶囊。
 import { KID_GAMES as KID_META, loadKidRecord } from '../kids/registry.js';
 const TABLES = [
   { id: 'guandan', icon: 'guandan', tone: 'coral', name: '掼蛋', desc: '组队配合 · 最完整参照系' },
@@ -88,51 +86,10 @@ const ICONS = {
 
 export default {
   data() {
-    return { tables: TABLES, kidGames: KID_GAMES, ICONS, authState: '', kidRecs: {} };
-  },
-  computed: {
-    authTone() {
-      if (this.authState.startsWith('✓')) return 'green';
-      if (this.authState.startsWith('访客离线') || this.authState.startsWith('票据验证需要网络')) return 'orange';
-      return 'coral';
-    },
+    return { tables: TABLES, kidGames: KID_GAMES, ICONS, kidRecs: {} };
   },
   mounted() {
     this.kidRecs = this.buildKidRecs();
-    // 授权参数接收（兼容宿主深链携一次性票据 + 身份参数；票据从 hash 段解析）
-    const q = new URLSearchParams(location.hash.split("?")[1] || "");
-    const ticket = q.get('ticket');
-    const uid = q.get('uid');
-    const name = q.get('name');
-    const api = q.get('api') || '';
-    if (q.get('guest') === '1') {
-      // 访客/离线模式：不消费票据，本地玩法零依赖
-      this.authState = '访客离线模式 · 本地玩法不受影响';
-      return;
-    }
-    if (ticket && uid) {
-      // 票据单次消费，同实例双挂载不得重复验证；同票有记忆则直接复用身份
-      let memo = null;
-      try { memo = JSON.parse(sessionStorage.getItem('island.auth') || 'null'); } catch (e) { /* ignore */ }
-      if (memo && memo.code === ticket && memo.userId) {
-        this.authState = '✓ 已绑定：' + (name || memo.userName || 'player') + '（#' + memo.userId + '）';
-        return;
-      }
-      fetch(api + '/api/v1/game/ticket/verify?code=' + ticket)
-        .then((r) => r.json())
-        .then((j) => {
-          const d = j.data || {};               // 统一信封：解包 data
-          if (d.verified) {
-            this.authState = '✓ 已绑定：' + (name || d.userName || 'player') + '（#' + (d.userId || Number(uid)) + '）';
-            try { sessionStorage.setItem('island.auth', JSON.stringify({ code: ticket, userId: d.userId || Number(uid), userName: d.userName || name })); } catch (e) { /* ignore */ }
-          } else {
-            this.authState = '票据验证未通过（可返回重进刷新）';
-          }
-        })
-        .catch(() => { this.authState = '票据验证需要网络（离线模式下本地玩法不受影响）'; });
-    } else if (uid) {
-      this.authState = '✓ 身份：' + (name || 'player') + '（#' + uid + '）';
-    }
   },
   methods: {
     iconSvg(name) { return this.ICONS[name] || ''; },
