@@ -1,12 +1,12 @@
 ## Plugin submission
 
 - Plugin ID: cando.gameisland
-- Version: 0.1.0
+- Version: 0.1.1
 - Publisher ID: cando
 
 ## Source repository and tag
 
-Source: https://github.com/CDThings/gameisland @ immutable tag `v0.1.0`
+Source: https://github.com/CDThings/gameisland @ immutable tag `v0.1.1`
 
 ## Capabilities and user workflow
 
@@ -17,7 +17,7 @@ A user opens the workbench from the DBX sidebar / plugin entry and plays directl
 ## Permissions, data access, and network access
 
 - `host.storage` only. The plugin stores a single key `cando.kv.v1` (a JSON blob of in-game saves / kids' records / mute preference), well under the 256 KiB single-value limit.
-- No network permission. No credentials, files, or user data are read; no DBX connection data is accessed.
+- No network permission. No credentials, files, or user data are read; no DBX connection data is accessed. v0.1.1 removed the residual ticket-verification path so the bundle is genuinely zero-network.
 
 ## Native sidecar behavior
 
@@ -33,6 +33,6 @@ MIT
 
 ## Confirmation
 
-- [x] The candidate packages are unsigned and match the disclosed source tag (`v0.1.0`); built by the official `@dbx-app/plugin-cli` reusable release workflow, and the SHA-256 / size match the release's `release-candidates.json`.
+- [x] The candidate packages are unsigned and match the disclosed source tag (`v0.1.1`); built by the official `@dbx-app/plugin-cli` reusable release workflow, and the SHA-256 / size match the release's `release-candidates.json`.
 - [x] I have not included private keys, tokens, credentials, or proprietary data.
 - [x] The candidates are listed in `candidates/cando.gameisland.json`; `plugins/` and `catalog/` were not edited manually.
